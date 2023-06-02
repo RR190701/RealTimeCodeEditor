@@ -44,10 +44,9 @@ const EditorPage = () => {
                         toast.success(`${username} joined the room.`);
                         console.log(`${username} joined`);
                     }
-                    console.log(clients);
+                    //swap instructor to first position
                     const instructorIdx = clients.findIndex(x => x.role === "Instructor");
-                    
-
+                    console.log(instructorIdx);
                     setClients(clients);
 
                     socketRef.current.emit(ACTIONS.SYNC_CODE, {
@@ -103,7 +102,7 @@ const EditorPage = () => {
                     <div className="logo">
                     <h2>Code Lab</h2>
                     </div>
-                    <h3>Connected</h3>
+                    <h3>Connected ({clients && clients.length})</h3>
                     <div className="clientsList">
                         {clients.map((client) => (
                             <Client

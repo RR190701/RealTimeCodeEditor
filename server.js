@@ -10,6 +10,7 @@ const Message = require('./models/chat');
 const LabCode = require('./models/labCode');
 const CodeCompileData = require('./models/codeCompile');
 const CodeCopyPasteData = require('./models/codeCopyPaste');
+const StudentActivity = require('./models/studentActivity');
 
 
 //connect DB
@@ -61,7 +62,8 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+    socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code, username }) => {
+        console.log("code changed",username);
         LabCode.updateOne({
             roomId
           }, {
@@ -71,6 +73,17 @@ io.on('connection', (socket) => {
           },
           {upsert:true}).then((res) =>{
             socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+          })
+        
+          StudentActivity.updateOne({
+            roomId, username
+          }, {
+            $set: {
+                lastActiveTime: new Date()
+            }
+          },
+          {upsert:true}).then((res) =>{
+              console.log("time updated");
           })
     });
 
@@ -119,6 +132,11 @@ io.on('connection', (socket) => {
     CodeCompileData.find({roomId,username}).then((result) => {
         socket.emit("get-student-progress-report", result);
     }); 
+
+    StudentActivity.findOne({roomId, username}).then((result) => {
+        socket.emit("F-get-student-activity", result);
+    });
+
   })  
 
   socket.on('copy-pasted-code', ({ roomId, username, compileTime, copiedData }) => {

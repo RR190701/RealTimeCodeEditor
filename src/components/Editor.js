@@ -51,6 +51,7 @@ const Editor = ({ socketRef, roomId, onCodeChange , username}) => {
                     socketRef.current.emit(ACTIONS.CODE_CHANGE, {
                         roomId,
                         code,
+                        username
                     });
                 }
             });
@@ -69,6 +70,7 @@ const Editor = ({ socketRef, roomId, onCodeChange , username}) => {
     
             socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
                 if (code !== null) {
+                  console.log("code changes received :",Date());
                     editorRef.current.setValue(code);
                 }
             });
